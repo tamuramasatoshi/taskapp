@@ -31,6 +31,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         
         //何も入力されていなくてもreturnキーを押せるようにする。
         searchBar.enablesReturnKeyAutomatically = false
+        searchBar.showsCancelButton = true
         
     }
     
@@ -137,19 +138,39 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         
     }
     
-    //検索画面にて文字を入力した場合
+    //検索画面にて文字を入力して検索
     
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         // 検索の文字を受け取る
         let text = searchBar.text!
-       // その文字に基づいて、配列を作成
         
-        taskArray = try! Realm().objects(Task.self).filter("category == %@",text)
-        // tableViewを更新
-        tableView.reloadData()
+        //入力されていない場合
+        if searchBar.text! == "" {
+            
+            taskArray = try! Realm().objects(Task.self).sorted(byKeyPath: "date", ascending: false)
+            tableView.reloadData()
+            
+        //検索が入力された場合
+        }else {
+            // その文字に基づいて、配列を作成
+            
+            taskArray = try! Realm().objects(Task.self).filter("category == %@",text)
+            // tableViewを更新
+            tableView.reloadData()
+        }
     }
         
-    }
-    
-    
+        //検索後、キャンセルボタンを押して一覧表示に戻る
+        
+        func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+            
+            searchBar.text! = ""
+            taskArray = try! Realm().objects(Task.self).sorted(byKeyPath: "date", ascending: false)
+            
+            tableView.reloadData()
+        }
+        
+}
+
+
 
